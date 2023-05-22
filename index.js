@@ -1,35 +1,29 @@
-const http = require("http");
-const fs = require("fs");
+const express = require("express");
 
-const handler = (req, res) => {
-  switch (req.url) {
-    case "/books":
-      res.write("This is a Books Endpoint");
-      break;
-    case "/products":
-      const products = [
-        { id: 1, name: "Apple", price: 10000 },
-        { id: 2, name: "Samsung", price: 8000 },
-        { id: 3, name: "Apple", price: 10500 },
-      ];
-      res.write(JSON.stringify(products));
-      break;
+const app = express();
 
-    case "/html":
-      const content = fs.readFileSync("index.html");
-      res.write(content);
+app.listen(5500, () => console.log("Server Up & running 5500"));
 
-    default:
-      res.write("Welcome to NodeJS!");
-      break;
-  }
+app.get("/", (req, res) => {
+  res.status(200);
+  res.send("Hello Express JS!");
+});
 
-  res.end();
-};
+const products = [
+  { id: 1, name: "Apple", price: 10000 },
+  { id: 2, name: "Samsung", price: 8000 },
+  { id: 3, name: "Apple", price: 10500 },
+];
+app.get("/products", (req, res) => {
+  res.status(200);
+  res.json(products);   
+});
 
-const server = http.createServer(handler);
-
-server.listen(5000);
-
-// REST API
-// API - HTTP
+// HTTP Status Code
+// 1xx - Informational Status Code
+// 100, 101, 102
+// 2xx - Success Status Code
+// 200 - OK, 201 - Created, 202 - Accepted, 204 - No Content
+// 3xx - Redirectional
+// 4xx - 400 Bad Resquest, 401 - Unauthorized,
+// 5xx - 500 - Internal Server Error
