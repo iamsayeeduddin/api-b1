@@ -9,7 +9,7 @@ const app = express();
 
 app.listen(5500, () => console.log("Server Up & running 5500"));
 
-mongoose.connect("mongodb://127.0.0.1:27017/api-b1");
+//mongoose.connect("mongodb://127.0.0.1:27017/api-b1");
 
 app.use(bodyParser.json());
 // app.get("/", defaultCtrl.get);
