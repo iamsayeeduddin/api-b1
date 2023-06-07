@@ -1,30 +1,65 @@
-// In Memory Database
-const products = [
-  { id: 1, name: "Apple", price: 10000 },
-  { id: 2, name: "Samsung", price: 8000 },
-  { id: 3, name: "Apple", price: 10500 },
-];
+const productRepo = require("../repositories/productRepo");
 
-const getProduct = (req, res) => {
-  res.json(products);
-  res.status(200);
+const errHandler = (err, res) => {
+  if (err.message && err.message.indexOf("validation failed") > -1) {
+    res.status(400);
+    res.json({ message: err.message });
+  } else {
+    res.status(500);
+    res.send("Internal Server Error");
+  }
 };
 
-const getProductById = (req, res) => {
-  const id = +req.params.id;
+const getOptions = (req) => {
+  let sort = req.query.sort;
+  let dir = req.query.dir || "";
+  const pageSize = +req.params.pageSize;
+  const page = +req.params.page;
+  const search = req.query.search || "";
 
-  // for (let index = 0; index < products.length; index++) {
-  //   if (products[index].id === id) {
-  //     res.json(products[index]);
-  //     res.status(200);
-  //     return;
-  //   }
-  //   res.send("Not Found");
-  //   res.status(404);
-  // }
+  if (!sort) {
+    sort = "price";
+    if (!dir) {
+      dir = "desc";
+    }
+  }
 
-  const product = products.find((p) => p.id === id);
+  return {
+    sort,
+    dir,
+    pageSize,
+    page,
+    search,
+  };
+};
 
+const get = async (req, res) => {
+  try {
+    const options = getOptions(req);
+    const data = await productRepo.get(options);
+    const totalRecord = await productRepo.getCount();
+    const totalPages = Math.ceil(totalRecord / options.pageSize);
+
+    const products = {
+      metadata: {
+        totalRecord,
+        totalPages,
+      },
+      data: data,
+    };
+
+    res.status(200);
+    res.json(products);
+  } catch (err) {
+    console.log(err);
+    res.status(500);
+    res.send("Internal Server Error");
+  }
+};
+
+const getProductById = async (req, res) => {
+  const id = req.params.id;
+  const product = await productRepo.getById(id);
   if (product) {
     res.status(200);
     res.json(product);
@@ -34,59 +69,59 @@ const getProductById = (req, res) => {
   }
 };
 
-const newProduct = (req, res) => {
-  console.log(req.body);
-  products.push(req.body);
-  res.status(201);
-  res.send("Created Succesfully!");
-};
-
-const deleteProduct = (req, res) => {
-  const id = +req.params.id;
-
-  const index = products.findIndex((p) => p.id === id);
-  products.splice(index, 1);
-  res.status(200);
-  res.send("Product Deleted");
-};
-
-// Full Update
-const updateProduct = (req, res) => {
-  const id = +req.params.id;
-  const product = products.find((p) => p.id === id);
-
-  if (product) {
-    product.name = req.body.name;
-    product.price = req.body.price;
-
-    res.status(204).send("Done");
-  } else {
-    res.status(404).json({ message: "Not Found" });
+const create = async (req, res) => {
+  try {
+    await productRepo.post(req.body);
+    res.status(201);
+    res.send("Created");
+  } catch (err) {
+    errHandler(err, res);
   }
 };
 
-const patch = (req, res) => {
-  const id = +req.params.id;
-  const product = products.find((p) => p.id === id);
+const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { body } = req;
 
-  if (product) {
-    for (const key in req.body) {
-      product[key] = req.body[key];
-    }
+    await productRepo.update(body, id);
+    res.status(200);
+    res.send("Updated");
+  } catch (err) {
+    errHandler(err, res);
+  }
+};
 
-    res.status(204).send("Done");
-  } else {
-    res.status(404).json({ message: "Not Found" });
+const patchProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { body } = req;
+
+    await productRepo.patch(body, id);
+    res.status(200);
+    res.send("Updated");
+  } catch (error) {
+    err(error, res);
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await productRepo.deletePrd(id);
+    res.status(200);
+    res.send("Deleted");
+  } catch (error) {
+    errHandler(err, res);
   }
 };
 
 module.exports = {
-  getProduct,
+  get,
   getProductById,
-  newProduct,
-  deleteProduct,
+  create,
   updateProduct,
-  patch,
+  patchProduct,
+  deleteProduct,
 };
-
-// REST API

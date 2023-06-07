@@ -1,19 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const productCtrl = require("../controller/productCtrl");
-const { route } = require("./defaultRoute");
+const prdCtrl = require("../controller/productCtrl");
 
-router.get("/", productCtrl.getProduct);
-router.get("/:id", productCtrl.getProductById);
-router.post("/", productCtrl.newProduct);
-router.delete("/:id", productCtrl.deleteProduct);
-router.put("/:id", productCtrl.updateProduct);
-router.patch("/:id", productCtrl.patch);
+router.get("/page/:page/size/:pageSize", prdCtrl.get);
+router.get("/:id", prdCtrl.getProductById);
+router.post("/create", prdCtrl.create);
+router.put("/:id", prdCtrl.updateProduct);
+router.patch("/:id", prdCtrl.patchProduct);
+router.delete("/:id", prdCtrl.deleteProduct);
 
 module.exports = router;
-
-// CRUD Operations
-// C - Create - POST
-// R - Read - GET
-// U - Update - PUT & PATCH
-// D - Delete - DELETE
