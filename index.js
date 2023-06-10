@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 
 const defaultRoute = require("./routes/defaultRoute");
 const productRoute = require("./routes/productRoute");
-const config = require("./config/config") || process.env;
+const config = process.env || require("./config/config");
 
 const app = express();
 
