@@ -1,4 +1,5 @@
 const productRepo = require("../repositories/productRepo");
+const logger = require("../utils/appLogger");
 
 const errHandler = (err, res) => {
   if (err.message && err.message.indexOf("validation failed") > -1) {
@@ -58,14 +59,16 @@ const get = async (req, res) => {
 };
 
 const getProductById = async (req, res) => {
-  const id = req.params.id;
-  const product = await productRepo.getById(id);
-  if (product) {
+  try {
+    const id = req.params.id;
+    const product = await productRepo.getById(id);
     res.status(200);
     res.json(product);
-  } else {
+    logger.info({ message: "Request Succesfully Executed", data: product });
+  } catch (err) {
     res.status(404);
     res.send("Not Found");
+    logger.error("Product Not Found");
   }
 };
 
