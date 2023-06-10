@@ -1,5 +1,6 @@
 const bunyan = require("bunyan");
 const path = require("path");
+const fs = require("fs");
 
 const dir = path.join(__dirname, "..", "logs");
 const logPath = path.join(dir, "app.log");
