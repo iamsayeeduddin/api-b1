@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 
 const defaultRoute = require("./routes/defaultRoute");
 const productRoute = require("./routes/productRoute");
-const config = require("./config/config");
+const config = require("./config/config") || process.env;
 
 const app = express();
 
@@ -27,7 +27,7 @@ app.listen(5500, () => console.log("Server Up & running 5500"));
 logger.info({ message: "Server is Running", portNo: 5500 });
 
 mongoose
-  .connect(process.env.dbUrl || config.dbUrl)
+  .connect(config.dbUrl)
   .then(() => {
     console.log("Connected to DB!");
   })
